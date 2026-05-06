@@ -3,664 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sai Meghana Technical Consultants LLP — Industrial Engineering Excellence</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Sai Meghana Technical Consultants LLP — Engineering Excellence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<!-- GSAP for Cinematic Scroll -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <style>
-:root {
-  --navy-900: #000d1a;
-  --navy-800: #001229;
-  --navy-700: #001f3f;
-  --navy-600: #002b54;
-  --navy-500: #003878;
-  --cyan-400: #0090cc;
-  --cyan-300: #00adef;
-  --cyan-200: #33c2f5;
-  --cyan-100: #99dff8;
-  --cyan-50:  #e6f7fd;
-  --white:    #ffffff;
-  --glass:    rgba(0, 18, 41, 0.72);
-  --glass-light: rgba(0, 18, 41, 0.45);
-  --border:   rgba(0, 173, 239, 0.12);
-  --border-strong: rgba(0, 173, 239, 0.3);
-  --text-muted: rgba(0, 173, 239, 0.55);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--navy-900)}
-body{font-family:'Syne',sans-serif;background:var(--navy-900);color:var(--white);overflow-x:hidden;cursor:none}
+  :root {
+    --deep-navy: #001229;
+    --midnight-blue: #002244;
+    --cyan: #00adef;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background-color: var(--deep-navy);
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  /* 3D Canvas */
+  #webgl-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none; /* Let clicks pass through to UI */
+  }
 
-/* CUSTOM CURSOR */
-#cursor{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--cyan-300);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;mix-blend-mode:screen}
-#cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1px solid rgba(0,173,239,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,transform .08s linear,opacity .3s}
-body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:16px;height:16px}
-body:has(a:hover) #cursor-ring,body:has(button:hover) #cursor-ring{width:52px;height:52px}
+  /* Spatial UI Overlays */
+  .ui-layer {
+    position: relative;
+    z-index: 10;
+    mix-blend-mode: difference;
+  }
 
-/* 3D CANVAS */
-#three-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  /* Header */
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+    pointer-events: auto;
+  }
+  .brand { display: flex; align-items: center; gap: 1.5rem; }
+  .logo-box {
+    width: 72px; /* Increased Logo */
+    height: 72px;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  .logo-box-inner { width: 36px; height: 36px; background: var(--cyan); }
+  .brand-text h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.15em; }
+  .brand-text p { font-size: 0.75rem; font-weight: 600; color: var(--cyan); letter-spacing: 0.1em; margin-top: 4px;}
+  nav { display: flex; gap: 3rem; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;border-bottom:1px solid var(--border);background:var(--glass);backdrop-filter:blur(24px) saturate(180%);transition:all .5s}
-.nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--white)}
-.logo-mark{display:flex;align-items:center;justify-content:center;width:38px;height:38px}
-.logo-mark svg{width:100%;height:100%}
-.logo-text{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;line-height:1}
-.logo-text small{display:block;font-size:.6rem;color:var(--text-muted);letter-spacing:.08em;margin-top:4px;font-weight:400}
-.nav-links{display:flex;gap:2.5rem}
-.nav-links a{text-decoration:none;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);transition:color .3s;position:relative}
-.nav-links a::after{content:'';position:absolute;bottom:-6px;left:0;width:0;height:1px;background:var(--cyan-300);transition:width .4s}
-.nav-links a:hover,.nav-links a.active{color:var(--cyan-200)}
-.nav-links a:hover::after,.nav-links a.active::after{width:100%}
-.nav-cta{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy-800);background:var(--cyan-300);padding:.5rem 1.4rem;border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background .3s,transform .2s;text-decoration:none}
-.nav-cta:hover{background:var(--cyan-200);transform:translateY(-1px)}
+  /* Scroll Sections */
+  .section {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 10vw;
+    pointer-events: auto;
+  }
+  .phase-label {
+    font-family: monospace;
+    color: var(--cyan);
+    letter-spacing: 0.3em;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+    max-width: 800px;
+  }
+  .section p {
+    font-size: 1.1rem;
+    font-weight: 300;
+    color: #cccccc;
+    max-width: 500px;
+    line-height: 1.8;
+  }
 
-/* SCROLL DOTS */
-.nav-dots{position:fixed;right:2rem;top:50%;transform:translateY(-50%);z-index:500;display:flex;flex-direction:column;gap:.8rem}
-.dot{width:4px;height:4px;border-radius:50%;background:var(--border-strong);cursor:pointer;transition:all .4s;position:relative}
-.dot.active{background:var(--cyan-300);transform:scale(1.8)}
-.dot::before{content:attr(data-label);position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;opacity:0;transition:opacity .3s}
-.dot:hover::before{opacity:1}
+  /* Telemetry Footer */
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    z-index: 50;
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+  .telemetry-left { color: #888; line-height: 1.6; }
+  .telemetry-left span { color: var(--cyan); }
+  .telemetry-right { display: flex; gap: 4rem; }
+  .t-block { display: flex; flex-direction: column; }
+  .t-block .lbl { color: #666; margin-bottom: 4px; }
 
-/* PHASE INDICATOR */
-#phase-bar{position:fixed;bottom:0;left:0;right:0;z-index:500;height:2px;background:var(--border)}
-#phase-progress{height:100%;background:linear-gradient(90deg,var(--navy-700),var(--cyan-300));width:0%;transition:width .6s ease}
-#phase-label{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:500;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:.8rem}
-#phase-label::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--cyan-300);animation:bp 2s infinite}
-@keyframes bp{0%,100%{opacity:1}50%{opacity:.15}}
-
-/* SCROLL CONTAINER */
-#scroller{position:relative;z-index:10;pointer-events:none}
-section{pointer-events:auto;min-height:100vh;padding:7rem 3rem 5rem;display:flex;flex-direction:column;justify-content:center;position:relative}
-
-/* HERO */
-#sec-home{background:linear-gradient(to bottom,transparent 0%,rgba(0,13,26,.3) 40%,rgba(0,13,26,.85) 100%)}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:.8rem;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan-200);margin-bottom:2.5rem;opacity:0;animation:fadeUp .8s .5s ease both}
-.hero-eyebrow::before{content:'';flex-shrink:0;width:24px;height:1px;background:var(--cyan-300)}
-h1.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,7.5rem);font-weight:300;line-height:.95;letter-spacing:-.02em;margin-bottom:2rem;opacity:0;animation:fadeUp .9s .7s ease both;max-width:820px}
-h1.hero-title em{font-style:italic;color:var(--cyan-300)}
-h1.hero-title strong{font-weight:600;display:block}
-.hero-sub{font-family:'Syne',sans-serif;font-size:1rem;color:rgba(0,173,239,.6);line-height:1.9;max-width:440px;margin-bottom:3.5rem;opacity:0;animation:fadeUp .8s .9s ease both;font-weight:400}
-.hero-btns{display:flex;gap:1.2rem;flex-wrap:wrap;opacity:0;animation:fadeUp .8s 1.1s ease both}
-.btn-p{display:inline-flex;align-items:center;gap:.6rem;background:var(--cyan-300);color:var(--navy-800);font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.9rem 2rem;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .3s}
-.btn-p:hover{background:var(--cyan-200);transform:translateY(-2px)}
-.btn-g{display:inline-flex;align-items:center;gap:.6rem;border:1px solid var(--border-strong);color:var(--cyan-200);font-family:'Syne',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.9rem 2rem;text-decoration:none;transition:all .3s;background:transparent}
-.btn-g:hover{background:rgba(0,173,239,.08);border-color:var(--cyan-300)}
-.hero-scroll{position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.8rem;opacity:0;animation:fadeUp .8s 1.5s ease both}
-.hero-scroll-line{width:1px;height:56px;background:linear-gradient(var(--cyan-300),transparent);animation:pulse 2.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.2;transform:scaleY(.7)}50%{opacity:1;transform:scaleY(1)}}
-.hero-scroll span{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
-
-/* TICKER */
-.ticker-wrap{position:relative;z-index:50;background:linear-gradient(135deg,var(--navy-700),var(--navy-600));border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:.8rem 0;white-space:nowrap;pointer-events:none}
-.ticker-track{display:inline-flex;animation:ticker 32s linear infinite}
-.ticker-track span{font-family:'DM Mono',monospace;font-size:.65rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-100);padding:0 2rem}
-.ticker-track span::after{content:'◆';margin-left:2rem;color:var(--cyan-400);opacity:.4}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-/* SECTION LABELS */
-.sec-eyebrow{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan-300);display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem}
-.sec-eyebrow::before{content:'';width:32px;height:1px;background:var(--cyan-300);flex-shrink:0}
-h2.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1.05;letter-spacing:-.02em;margin-bottom:1.4rem}
-h2.sec-title em{font-style:italic;color:var(--cyan-300)}
-.sec-desc{color:rgba(0,173,239,.55);font-size:.95rem;line-height:1.9;max-width:500px;font-family:'Syne',sans-serif;font-weight:400}
-
-/* SERVICES */
-#sec-services{background:linear-gradient(to bottom,rgba(0,13,26,.9) 0%,rgba(0,18,41,.95) 100%)}
-.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);margin-top:3.5rem;border:1px solid var(--border)}
-.svc-card{background:var(--navy-800);padding:2.4rem 2rem;position:relative;overflow:hidden;cursor:default;transition:background .4s}
-.svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan-300),transparent);transform:scaleX(0);transition:transform .5s;transform-origin:center}
-.svc-card:hover{background:rgba(0,31,63,.9)}
-.svc-card:hover::after{transform:scaleX(1)}
-.svc-num{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text-muted);letter-spacing:.12em;margin-bottom:1.5rem}
-.svc-icon-wrap{width:48px;height:48px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem;background:rgba(0,173,239,.05);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
-.svc-icon-wrap svg{width:22px;height:22px;stroke:var(--cyan-300);fill:none;stroke-width:1.5}
-.svc-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;margin-bottom:.6rem;line-height:1.2;color:var(--white)}
-.svc-desc{font-size:.82rem;color:rgba(0,173,239,.5);line-height:1.8;font-weight:400}
-.svc-arrow{position:absolute;bottom:2rem;right:2rem;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--cyan-300);letter-spacing:.1em;opacity:0;transition:opacity .3s,transform .3s;transform:translateX(-6px)}
-.svc-card:hover .svc-arrow{opacity:1;transform:translateX(0)}
-
-/* EXPERTISE */
-#sec-expertise{background:rgba(0,10,20,.95)}
-.exp-table{width:100%;margin-top:3.5rem;border:1px solid var(--border)}
-.exp-row{display:grid;grid-template-columns:3rem 1fr 12rem;align-items:center;padding:1.4rem 2rem;border-bottom:1px solid var(--border);background:transparent;transition:background .3s;gap:2rem;position:relative;overflow:hidden}
-.exp-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(0,173,239,.1),transparent);transition:width .5s}
-.exp-row:hover{background:rgba(0,173,239,.03)}
-.exp-row:hover::before{width:100%}
-.exp-row:last-child{border-bottom:none}
-.exp-n{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--text-muted)}
-.exp-row:hover .exp-n{color:var(--cyan-300)}
-.exp-info{display:flex;flex-direction:column;gap:.3rem}
-.exp-title{font-size:.92rem;font-weight:600;color:var(--white);letter-spacing:.01em}
-.exp-sub{font-size:.78rem;color:rgba(0,173,239,.45)}
-.exp-badge{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-200);border:1px solid var(--border-strong);padding:.3rem .8rem;text-align:center;background:rgba(0,173,239,.04)}
-
-/* ABOUT */
-#sec-about{background:linear-gradient(to bottom,rgba(0,10,20,.95) 0%,rgba(0,15,31,.9) 100%)}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-top:3rem}
-.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:2.5rem}
-.stat-cell{background:var(--navy-800);padding:1.8rem 1.4rem}
-.stat-val{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;color:var(--cyan-300);line-height:1}
-.stat-label{font-size:.72rem;color:var(--text-muted);margin-top:.4rem;letter-spacing:.08em;font-weight:500;text-transform:uppercase}
-.about-panel{background:var(--navy-800);border:1px solid var(--border);padding:2.2rem}
-.about-panel h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;margin-bottom:1.5rem;color:var(--white)}
-.legal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 2rem}
-.legal-item label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:.25rem}
-.legal-item span{font-size:.88rem;font-weight:500;color:var(--cyan-100)}
-.values-strip{display:flex;gap:2rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
-.value-tag{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan-300);display:flex;align-items:center;gap:.5rem}
-.value-tag::before{content:'◆';font-size:.4rem;color:var(--cyan-400)}
-
-/* CONTACT */
-#sec-contact{background:rgba(0,8,18,.97)}
-.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;margin-top:3rem}
-.contact-list{display:flex;flex-direction:column;gap:.8rem;margin-top:1.5rem}
-.cc{display:flex;align-items:center;gap:1.2rem;padding:1.2rem 1.4rem;border:1px solid var(--border);background:var(--navy-800);text-decoration:none;color:var(--white);transition:all .3s;position:relative;overflow:hidden}
-.cc::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,173,239,.06),transparent);transform:translateX(-100%);transition:transform .4s}
-.cc:hover{border-color:var(--border-strong)}
-.cc:hover::after{transform:translateX(0)}
-.cc-icon{width:40px;height:40px;background:rgba(0,173,239,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
-.cc-icon svg{width:18px;height:18px;stroke:var(--cyan-300);fill:none;stroke-width:1.5}
-.cc-body{position:relative;z-index:1}
-.cc-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.2rem}
-.cc-val{font-size:.9rem;font-weight:600;color:var(--cyan-100)}
-
-/* FORM */
-.form-panel{background:var(--navy-800);border:1px solid var(--border);padding:3rem}
-.form-panel h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--white);margin-bottom:.5rem}
-.form-panel p{font-size:.84rem;color:var(--text-muted);margin-bottom:2rem}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.fg{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
-.fg label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
-.fg input,.fg select,.fg textarea{background:rgba(0,173,239,.04);border:1px solid var(--border);color:var(--white);padding:.85rem 1rem;font-family:'Syne',sans-serif;font-size:.88rem;outline:none;resize:none;width:100%;transition:all .3s}
-.fg input::placeholder,.fg textarea::placeholder{color:rgba(0,173,239,.25)}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cyan-300);background:rgba(0,173,239,.06)}
-.fg select option{background:var(--navy-700);color:var(--white)}
-.submit-btn{width:100%;background:var(--cyan-300);color:var(--navy-800);font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:1.1rem;border:none;cursor:pointer;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .3s;margin-top:.5rem}
-.submit-btn:hover{background:var(--cyan-200);transform:translateY(-1px)}
-
-/* FOOTER */
-footer{position:relative;z-index:50;pointer-events:auto;background:var(--navy-900);border-top:1px solid var(--border);padding:2.5rem 3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem}
-.ft-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,173,239,.5)}
-.ft-meta{font-size:.7rem;color:rgba(0,173,239,.3);margin-top:.3rem;font-family:'DM Mono',monospace;letter-spacing:.06em}
-.ft-links{display:flex;gap:2rem}
-.ft-links a{font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(0,173,239,.35);text-decoration:none;letter-spacing:.1em;text-transform:uppercase;transition:color .3s}
-.ft-links a:hover{color:var(--cyan-300)}
-.ft-copy{font-family:'DM Mono',monospace;font-size:.65rem;color:rgba(0,173,239,.2);letter-spacing:.04em}
-
-/* REVEAL */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
-.reveal.visible{opacity:1;transform:none}
-.reveal-left{opacity:0;transform:translateX(-24px);transition:opacity .8s ease,transform .8s ease}
-.reveal-left.visible{opacity:1;transform:none}
-
-@media(max-width:900px){
-  nav{padding:0 1.5rem}
-  .nav-links{display:none}
-  section{padding:5rem 1.5rem 4rem}
-  .about-grid,.contact-grid{grid-template-columns:1fr;gap:3rem}
-  .form-row{grid-template-columns:1fr}
-  footer{padding:2rem 1.5rem}
-  .nav-dots{display:none}
-  body{cursor:auto}
-  #cursor,#cursor-ring{display:none}
-}
+  /* Spacer for scroll height */
+  #scroll-proxy { height: 500vh; position: absolute; top: 0; width: 100%; z-index: -1; }
 </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<div id="webgl-container"></div>
 
-<!-- CANVAS -->
-<canvas id="three-canvas"></canvas>
-
-<!-- NAV -->
-<nav id="main-nav">
-  <a href="#sec-home" class="nav-logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <g transform="translate(60,2)">
-          <polygon points="0,0 13,15 0,10" fill="#001f3f" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,0 -13,15 0,10" fill="#00adef" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,7 26,29 0,20" fill="#002b54" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,7 -26,29 0,20" fill="#00c4f0" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,14 39,43 0,30" fill="#003878" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,14 -39,43 0,30" fill="#33d2ff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,21 52,57 0,40" fill="#004d99" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,21 -52,57 0,40" fill="#40d9ff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,28 65,71 0,50" fill="#0066b3" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-          <polygon points="0,28 -65,71 0,50" fill="#55e0ff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-        </g>
-      </svg>
+<div class="ui-layer">
+  <header>
+    <div class="brand">
+      <div class="logo-box">
+        <!-- SVG Logo -->
+        <svg viewBox="0 0 200 130" fill="none" style="width: 80%; height: 80%;">
+          <g transform="translate(100, 5)">
+            <polygon points="0,0 22,25 0,16" fill="#ffffff" stroke="#002147" stroke-width="2"/>
+            <polygon points="0,0 -22,25 0,16" fill="#00adef" stroke="#002147" stroke-width="2"/>
+            <polygon points="0,11 44,48 0,33" fill="#ffffff" stroke="#002147" stroke-width="2"/>
+            <polygon points="0,11 -44,48 0,33" fill="#00adef" stroke="#002147" stroke-width="2"/>
+            <polygon points="0,22 66,71 0,50" fill="#ffffff" stroke="#002147" stroke-width="2"/>
+            <polygon points="0,22 -66,71 0,50" fill="#00adef" stroke="#002147" stroke-width="2"/>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>SAI MEGHANA</h1>
+        <p>TECHNICAL CONSULTANTS</p>
+      </div>
     </div>
-    <div class="logo-text">Sai Meghana <small>Technical Consultants LLP</small></div>
-  </a>
-  <div class="nav-links">
-    <a href="#sec-home" data-nav class="active">Home</a>
-    <a href="#sec-services" data-nav>Services</a>
-    <a href="#sec-expertise" data-nav>Expertise</a>
-    <a href="#sec-about" data-nav>About</a>
-    <a href="#sec-contact" data-nav>Contact</a>
-  </div>
-  <a href="tel:+919963399663" class="nav-cta">Call Now</a>
-</nav>
+    <nav>
+      <span>HOME</span><span>SERVICES</span><span>EXPERTISE</span><span>CONTACT</span>
+    </nav>
+  </header>
 
-<!-- DOTS -->
-<div class="nav-dots" id="navDots">
-  <div class="dot active" data-target="sec-home" data-label="Home"></div>
-  <div class="dot" data-target="sec-services" data-label="Services"></div>
-  <div class="dot" data-target="sec-expertise" data-label="Expertise"></div>
-  <div class="dot" data-target="sec-about" data-label="About"></div>
-  <div class="dot" data-target="sec-contact" data-label="Contact"></div>
+  <!-- Content synced with ScrollTrigger -->
+  <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh;">
+    <div class="section" id="sec-content">
+      <div class="phase-label" id="t-sub">PHASE I — BLUEPRINT VOID</div>
+      <h2 id="t-head">ENGINEERING<br>EXCELLENCE</h2>
+      <p id="t-desc">A digital twin of futuristic industrial potential. We architect the unseen.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="telemetry-left">
+      SYSTEM_STATE: <span>NOMINAL</span><br>
+      LOC: HYDERABAD, TS<br>
+      EST: 2+ YRS
+    </div>
+    <div class="telemetry-right">
+      <div class="t-block"><span class="lbl">SCROLL</span><span>TO EVOLVE</span></div>
+      <div class="t-block"><span class="lbl">PHASE</span><span id="t-phase">01 / 05</span></div>
+    </div>
+  </footer>
 </div>
 
-<!-- PHASE BAR -->
-<div id="phase-bar"><div id="phase-progress"></div></div>
-<div id="phase-label"><span id="phaseText">Blueprint Phase — Master Layout</span></div>
+<div id="scroll-proxy"></div>
 
-<!-- SCROLL CONTAINER -->
-<div id="scroller">
-
-<!-- HOME -->
-<section id="sec-home" data-scene="home">
-  <div class="hero-eyebrow">Est. 2+ Years · LLP · GST Registered · Hyderabad</div>
-  <h1 class="hero-title">Engineering<br><em>Excellence.</em><br><strong>Built to Last.</strong></h1>
-  <p class="hero-sub">End-to-end civil, structural, and architectural consultancy for industrial and infrastructure projects across Telangana and beyond.</p>
-  <div class="hero-btns">
-    <a href="#sec-services" class="btn-p">Explore Services →</a>
-    <a href="tel:+919963399663" class="btn-g">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.3 10.77a19.79 19.79 0 01-3.07-8.63A2 2 0 013.21 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-      +91 99633 99663
-    </a>
-  </div>
-  <div class="hero-scroll">
-    <div class="hero-scroll-line"></div>
-    <span>Scroll to build</span>
-  </div>
-</section>
-
-<!-- TICKER -->
-<div class="ticker-wrap" style="position:relative;z-index:50;pointer-events:auto">
-  <div class="ticker-track">
-    <span>Architectural Design</span><span>RCC Structures</span><span>Machine Foundations</span><span>Industrial Sheds</span><span>Roads &amp; Drainage</span><span>Silos &amp; Chimneys</span><span>Contract Management</span><span>Civil Supervision</span>
-    <span>Architectural Design</span><span>RCC Structures</span><span>Machine Foundations</span><span>Industrial Sheds</span><span>Roads &amp; Drainage</span><span>Silos &amp; Chimneys</span><span>Contract Management</span><span>Civil Supervision</span>
-  </div>
-</div>
-
-<!-- SERVICES -->
-<section id="sec-services" data-scene="services">
-  <div class="reveal">
-    <div class="sec-eyebrow">Core Services</div>
-    <h2 class="sec-title">What We <em>Deliver</em></h2>
-    <p class="sec-desc">Comprehensive construction and consultancy services for industrial and infrastructure projects — executed with precision.</p>
-  </div>
-  <div class="svc-grid reveal" style="transition-delay:.2s">
-    <div class="svc-card">
-      <div class="svc-num">01</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-      <div class="svc-name">Architectural Layout Design</div>
-      <p class="svc-desc">Industrial facility planning with precision CAD documentation and full regulatory compliance.</p>
-      <span class="svc-arrow">Architecture →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">02</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg></div>
-      <div class="svc-name">Reinforced Cement Concrete</div>
-      <p class="svc-desc">Structural RCC works — foundations, slabs, beams, columns — designed for maximum durability.</p>
-      <span class="svc-arrow">Structural →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">03</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
-      <div class="svc-name">Heavy Machine Foundations</div>
-      <p class="svc-desc">Dynamic load analysis and vibration isolation for turbines, compressors, and industrial presses.</p>
-      <span class="svc-arrow">Specialized →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">04</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="svc-name">Roads, Drainage &amp; Utilities</div>
-      <p class="svc-desc">Complete internal utility infrastructure — roads, storm drainage, water supply, utility corridors.</p>
-      <span class="svc-arrow">Infrastructure →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">05</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></div>
-      <div class="svc-name">Silos, Chimneys &amp; Sheds</div>
-      <p class="svc-desc">Large-span industrial structures for manufacturing, bulk storage, and emission management.</p>
-      <span class="svc-arrow">Industrial →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">06</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-      <div class="svc-name">Contract Management</div>
-      <p class="svc-desc">Vendor selection, tendering, and contract management for on-time, on-budget delivery.</p>
-      <span class="svc-arrow">Consultancy →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">07</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg></div>
-      <div class="svc-name">Architectural Engineering</div>
-      <p class="svc-desc">Integrated structural and architectural engineering for industrial and commercial developments.</p>
-      <span class="svc-arrow">Engineering →</span>
-    </div>
-    <div class="svc-card">
-      <div class="svc-num">08</div>
-      <div class="svc-icon-wrap"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-      <div class="svc-name">Civil Supervision (E2E)</div>
-      <p class="svc-desc">End-to-end site supervision, quality assurance, and progress monitoring through final handover.</p>
-      <span class="svc-arrow">Supervision →</span>
-    </div>
-  </div>
-</section>
-
-<!-- EXPERTISE -->
-<section id="sec-expertise" data-scene="expertise">
-  <div class="reveal">
-    <div class="sec-eyebrow">Domain Expertise</div>
-    <h2 class="sec-title">Industrial-Grade<br><em>Capabilities</em></h2>
-    <p class="sec-desc">Eight specialized domains built over 2+ years of project delivery — from concept to structural completion.</p>
-  </div>
-  <div class="exp-table reveal" style="transition-delay:.2s">
-    <div class="exp-row"><span class="exp-n">01</span><div class="exp-info"><div class="exp-title">Industrial Architectural Services — Plant Layout &amp; Facility Design</div><div class="exp-sub">Master layout planning, admin blocks, safety &amp; regulatory compliance</div></div><span class="exp-badge">Architecture</span></div>
-    <div class="exp-row"><span class="exp-n">02</span><div class="exp-info"><div class="exp-title">Structural RCC Works — Foundations, Slabs &amp; Frames</div><div class="exp-sub">IS code compliance, structural frame construction, quality material testing</div></div><span class="exp-badge">Structural</span></div>
-    <div class="exp-row"><span class="exp-n">03</span><div class="exp-info"><div class="exp-title">Heavy Machine Foundations — Precision Engineering</div><div class="exp-sub">Dynamic load analysis, anchor bolt design, post-installation alignment</div></div><span class="exp-badge">Specialized</span></div>
-    <div class="exp-row"><span class="exp-n">04</span><div class="exp-info"><div class="exp-title">Industrial Utility Infrastructure — Roads, Drainage &amp; Water Supply</div><div class="exp-sub">Internal road systems, storm drainage, water networks, utility corridors</div></div><span class="exp-badge">Infrastructure</span></div>
-    <div class="exp-row"><span class="exp-n">05</span><div class="exp-info"><div class="exp-title">Silos, Chimneys &amp; Industrial Sheds — Storage &amp; Process Structures</div><div class="exp-sub">Grain &amp; cement silos, industrial chimneys, large-span pre-engineered sheds</div></div><span class="exp-badge">Industrial</span></div>
-    <div class="exp-row"><span class="exp-n">06</span><div class="exp-info"><div class="exp-title">Vendor Selection, Tendering &amp; Contract Management</div><div class="exp-sub">RFQ preparation, techno-commercial comparison, contractor performance monitoring</div></div><span class="exp-badge">Consultancy</span></div>
-    <div class="exp-row"><span class="exp-n">07</span><div class="exp-info"><div class="exp-title">Architectural Engineering Services — Design &amp; Build Integration</div><div class="exp-sub">BOQ preparation, MEP coordination, value engineering &amp; cost optimization</div></div><span class="exp-badge">Engineering</span></div>
-    <div class="exp-row"><span class="exp-n">08</span><div class="exp-info"><div class="exp-title">Civil &amp; Infrastructure — End-to-End Supervisory Services</div><div class="exp-sub">Site supervision, quality assurance, material testing, punch-list resolution</div></div><span class="exp-badge">Supervision</span></div>
-  </div>
-</section>
-
-<!-- ABOUT -->
-<section id="sec-about" data-scene="about">
-  <div class="reveal">
-    <div class="sec-eyebrow">About Us</div>
-    <h2 class="sec-title">A Legacy of<br><em>Technical Precision</em></h2>
-  </div>
-  <div class="about-grid">
-    <div class="reveal-left">
-      <p class="sec-desc" style="max-width:100%">Founded in Hyderabad, Sai Meghana Technical Consultants LLP has grown from a focused civil consultancy into a full-spectrum technical services firm over 2+ years. Every structure we deliver reflects our commitment to engineering excellence.</p>
-      <div class="about-stats">
-        <div class="stat-cell"><div class="stat-val">2+</div><div class="stat-label">Years in Operation</div></div>
-        <div class="stat-cell"><div class="stat-val">8+</div><div class="stat-label">Service Verticals</div></div>
-        <div class="stat-cell"><div class="stat-val">LLP</div><div class="stat-label">Legal Partnership</div></div>
-        <div class="stat-cell"><div class="stat-val">GST</div><div class="stat-label">Registered Oct 2024</div></div>
-      </div>
-      <div class="values-strip">
-        <span class="value-tag">Precision</span>
-        <span class="value-tag">Integrity</span>
-        <span class="value-tag">Timeliness</span>
-        <span class="value-tag">Excellence</span>
-      </div>
-    </div>
-    <div class="reveal" style="transition-delay:.2s">
-      <div class="about-panel">
-        <h3>Company Details</h3>
-        <div class="legal-grid">
-          <div class="legal-item"><label>Company</label><span>Sai Meghana Technical Consultants LLP</span></div>
-          <div class="legal-item"><label>Legal Status</label><span>Partnership (LLP)</span></div>
-          <div class="legal-item"><label>Nature</label><span>Service Provider &amp; Others</span></div>
-          <div class="legal-item"><label>GST Number</label><span>36**********1ZZ</span></div>
-          <div class="legal-item"><label>GST Registered</label><span>October 2024</span></div>
-          <div class="legal-item"><label>Location</label><span>Hyderabad, Telangana</span></div>
-          <div class="legal-item"><label>Turnover Range</label><span>0 – 40 Lakh p.a.</span></div>
-          <div class="legal-item"><label>Experience</label><span>2+ Years Active</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="sec-contact" data-scene="contact">
-  <div class="reveal">
-    <div class="sec-eyebrow">Get In Touch</div>
-    <h2 class="sec-title">Let's Build<br><em>Together.</em></h2>
-    <p class="sec-desc">Reach out for project enquiries, technical consultations, or to request a competitive quote.</p>
-  </div>
-  <div class="contact-grid">
-    <div class="reveal-left" style="transition-delay:.1s">
-      <div class="contact-list">
-        <a href="tel:+919963399663" class="cc"><div class="cc-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.3 10.77a19.79 19.79 0 01-3.07-8.63A2 2 0 013.21 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div class="cc-body"><div class="cc-label">Phone</div><div class="cc-val">+91 99633 99663</div></div></a>
-        <a href="mailto:vnvlrao@yahoo.com" class="cc"><div class="cc-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="cc-body"><div class="cc-label">Email</div><div class="cc-val">vnvlrao@yahoo.com</div></div></a>
-        <div class="cc" style="cursor:default"><div class="cc-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="cc-body"><div class="cc-label">Location</div><div class="cc-val">Hyderabad, Telangana, India</div></div></div>
-        <div class="cc" style="cursor:default"><div class="cc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="cc-body"><div class="cc-label">Business Hours</div><div class="cc-val">Mon – Sat, 9:00 AM – 6:00 PM</div></div></div>
-      </div>
-    </div>
-    <div class="reveal" style="transition-delay:.2s">
-      <div class="form-panel">
-        <div id="formArea">
-          <h3>Request a Quote</h3>
-          <p>All enquiries are sent directly to <strong style="color:var(--cyan-200)">vnvlrao@yahoo.com</strong></p>
-          <div class="form-row">
-            <div class="fg"><label>Full Name *</label><input type="text" id="fn" placeholder="Your name" required></div>
-            <div class="fg"><label>Company</label><input type="text" id="fc" placeholder="Organisation"></div>
-          </div>
-          <div class="form-row">
-            <div class="fg"><label>Phone *</label><input type="tel" id="fp" placeholder="+91 XXXXX XXXXX" required></div>
-            <div class="fg"><label>Email</label><input type="email" id="fe" placeholder="your@email.com"></div>
-          </div>
-          <div class="fg"><label>Service Required *</label>
-            <select id="fs">
-              <option value="">Select a service...</option>
-              <option>Architectural Layout Designing Services</option>
-              <option>Reinforced Cement Concrete Work</option>
-              <option>Heavy Machine Foundations</option>
-              <option>Roads, Drainage &amp; Utility Infrastructure</option>
-              <option>Silos, Chimneys &amp; Industrial Sheds</option>
-              <option>Vendor Selection &amp; Contract Management</option>
-              <option>Architectural Engineering Services</option>
-              <option>Civil &amp; Infrastructure Supervision</option>
-              <option>Multiple Services / General Enquiry</option>
-            </select>
-          </div>
-          <div class="fg"><label>Project Details *</label><textarea id="fd" rows="4" placeholder="Describe your project — structure type, size, timeline, requirements..." required></textarea></div>
-          <button class="submit-btn" onclick="sendEnq()">Send Enquiry →</button>
-        </div>
-        <div id="successArea" style="display:none;text-align:center;padding:3rem 1rem">
-          <div style="width:56px;height:56px;border:2px solid var(--cyan-300);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-300)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <h4 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--white);margin-bottom:.6rem">Enquiry Transmitted</h4>
-          <p style="font-size:.88rem;color:var(--text-muted);line-height:1.9">Your message has been sent to <span style="color:var(--cyan-300)">vnvlrao@yahoo.com</span>.<br>We'll respond within one business day.<br><br>For urgent needs: <a href="tel:+919963399663" style="color:var(--cyan-200)">+91 99633 99663</a></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-</div><!-- /scroller -->
-
-<footer>
-  <div>
-    <div class="ft-brand">Sai Meghana Technical Consultants LLP</div>
-    <div class="ft-meta">Hyderabad, Telangana · GST: 36**********1ZZ · Reg. Oct 2024</div>
-  </div>
-  <div class="ft-links">
-    <a href="#sec-home">Home</a><a href="#sec-services">Services</a><a href="#sec-expertise">Expertise</a><a href="#sec-about">About</a><a href="#sec-contact">Contact</a>
-  </div>
-  <div class="ft-copy">© 2024 Sai Meghana Technical Consultants LLP. All rights reserved.</div>
-</footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-'use strict';
+// ─────────────────────────────────────────────────────────────────
+// UI CONTENT DATA
+// ─────────────────────────────────────────────────────────────────
+const sections = [
+  { sub: "PHASE I — BLUEPRINT VOID", head: "ENGINEERING<br>EXCELLENCE", desc: "A digital twin of futuristic industrial potential. We architect the unseen." },
+  { sub: "PHASE II — ROBOTIC CONSTRUCTION", head: "DYNAMIC<br>ASSEMBLY", desc: "Procedural structural growth. Heavy machine foundations and internal utilities emerge." },
+  { sub: "PHASE III — STEEL & CONCRETE", head: "STRUCTURAL<br>GROWTH", desc: "Silos, chimneys, and industrial sheds assemble. The architecture of industry takes physical form." },
+  { sub: "PHASE IV — TELEMETRY", head: "INDUSTRIAL<br>INTELLIGENCE", desc: "Data visualization architecture. Monitoring vendor selection, contract management, and site supervision." },
+  { sub: "PHASE V — COMPLETE", head: "SAI MEGHANA<br>LLP", desc: "2+ years of precision, integrity, and engineering authority in Hyderabad, Telangana." }
+];
 
-/* ═══════════════════════════════════════════
-   SAI MEGHANA — CINEMATIC 3D ENGINE v2
-   Deep Navy · Blueprint Cyan · Industrial
-═══════════════════════════════════════════ */
-
-// CURSOR
-const cursor = document.getElementById('cursor');
-const cursorRing = document.getElementById('cursor-ring');
-let cx = window.innerWidth/2, cy = window.innerHeight/2;
-let rx = cx, ry = cy;
-document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; cursor.style.left = cx+'px'; cursor.style.top = cy+'px'; });
-(function animCursor(){
-  rx += (cx-rx)*.12; ry += (cy-ry)*.12;
-  cursorRing.style.left = rx+'px'; cursorRing.style.top = ry+'px';
-  requestAnimationFrame(animCursor);
-})();
-
-// THREE SETUP
-const canvas = document.getElementById('three-canvas');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-
+// ─────────────────────────────────────────────────────────────────
+// THREE.JS ENGINE SETUP
+// ─────────────────────────────────────────────────────────────────
+const container = document.getElementById('webgl-container');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x00080f);
-scene.fog = new THREE.FogExp2(0x00080f, 0.018);
+scene.background = new THREE.Color('#002244'); // Midnight Blue
+scene.fog = new THREE.FogExp2('#002244', 0.015);
 
-const camera = new THREE.PerspectiveCamera(48, window.innerWidth/window.innerHeight, 0.1, 600);
-camera.position.set(0, 22, 62);
-camera.lookAt(0, 4, 0);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+container.appendChild(renderer.domElement);
 
-// STATE
-const S = {
-  time: 0, dt: 0, lastTime: 0, fps: 60,
-  mouse: new THREE.Vector2(), targetMouse: new THREE.Vector2(),
-  scroll: 0, section: 'home',
-  dragX: 0, isDragging: false, prevMouseX: 0,
-  visible: true,
-  buildProgress: 0, targetBuild: 0,
-};
-const lerpV = (a, b, t) => a + (b - a) * t;
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+scene.add(ambientLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 2.5);
+dirLight.position.set(30, 50, -20);
+dirLight.castShadow = true;
+scene.add(dirLight);
+const spotLight = new THREE.SpotLight('#00adef', 4);
+spotLight.position.set(-20, 20, 20);
+scene.add(spotLight);
 
-// LIGHTS
-scene.add(new THREE.AmbientLight(0x002244, 1.2));
+// ─────────────────────────────────────────────────────────────────
+// CUSTOM BLUEPRINT SHADER & MATERIALS
+// ─────────────────────────────────────────────────────────────────
+const blueprintMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    time: { value: 0 },
+    uColor: { value: new THREE.Color('#00adef') },
+    uProgress: { value: 0.0 }
+  },
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  vertexShader: `
+    varying vec2 vUv; varying vec3 vPos;
+    void main() { vUv = uv; vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+  `,
+  fragmentShader: `
+    uniform float time; uniform vec3 uColor; uniform float uProgress;
+    varying vec2 vUv; varying vec3 vPos;
+    void main() {
+      vec2 grid = abs(fract(vUv * 10.0 - 0.5) - 0.5) / fwidth(vUv * 10.0);
+      float line = min(grid.x, grid.y);
+      float alpha = 1.0 - min(line, 1.0);
+      float scan = sin(vPos.y * 4.0 - time * 2.0) * 0.5 + 0.5;
+      float opacity = (alpha + scan * 0.5) * (1.0 - uProgress) * 0.7;
+      gl_FragColor = vec4(uColor, opacity);
+    }
+  `
+});
 
-const sunLight = new THREE.DirectionalLight(0xc8e8ff, 0.9);
-sunLight.position.set(40, 80, 30);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.set(2048, 2048);
-sunLight.shadow.camera.near = 1;
-sunLight.shadow.camera.far = 300;
-sunLight.shadow.camera.left = -120; sunLight.shadow.camera.right = 120;
-sunLight.shadow.camera.top = 120; sunLight.shadow.camera.bottom = -120;
-sunLight.shadow.bias = -0.001;
-scene.add(sunLight);
+const solidMaterial = new THREE.MeshStandardMaterial({
+  color: 0xffffff, roughness: 0.1, metalness: 0.2
+});
 
-const cyanFill = new THREE.PointLight(0x0090cc, 2.5, 120);
-cyanFill.position.set(0, 30, 0);
-scene.add(cyanFill);
-
-const rimA = new THREE.DirectionalLight(0x004d99, 0.6);
-rimA.position.set(-60, 20, -30);
-scene.add(rimA);
-
-const rimB = new THREE.DirectionalLight(0x003366, 0.4);
-rimB.position.set(60, 5, -40);
-scene.add(rimB);
-
-// MATERIALS
-const matGrid = new THREE.LineBasicMaterial({color:0x003878,transparent:true,opacity:.07});
-const matBP   = () => new THREE.MeshBasicMaterial({color:0x003878,wireframe:true,transparent:true,opacity:.2});
-const matAsm  = () => new THREE.MeshPhongMaterial({color:0x002b54,emissive:0x001229,emissiveIntensity:.3,transparent:true,opacity:.7,shininess:60});
-const matSolid= () => new THREE.MeshPhongMaterial({color:0xe8f4fc,emissive:0x001f3f,emissiveIntensity:.08,shininess:80,specular:0x0044aa});
-const matGlass= () => new THREE.MeshPhongMaterial({color:0x004488,emissive:0x002244,emissiveIntensity:.3,transparent:true,opacity:.55,shininess:200,specular:0x00aaff});
-const matPipe = new THREE.MeshPhongMaterial({color:0x90d8f0,emissive:0x002244,emissiveIntensity:.15,shininess:100});
-const matGround = new THREE.MeshPhongMaterial({color:0x001830,shininess:20,specular:0x003366});
-
-// GROUND
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(240,240), matGround);
-ground.rotation.x = -Math.PI/2;
+// Ground
+const groundGeo = new THREE.PlaneGeometry(200, 200);
+const groundMat = new THREE.MeshStandardMaterial({ color: '#001229', roughness: 0.2, metalness: 0.8 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.1;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// GRID
-function buildGrid(){
-  const g = new THREE.Group();
-  const sz = 160, step = 8;
-  for(let i = -sz/2; i <= sz/2; i += step){
-    const hg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-sz/2,.02,i),new THREE.Vector3(sz/2,.02,i)]);
-    const vg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i,.02,-sz/2),new THREE.Vector3(i,.02,sz/2)]);
-    g.add(new THREE.Line(hg,matGrid)); g.add(new THREE.Line(vg,matGrid));
+// ─────────────────────────────────────────────────────────────────
+// PROCEDURAL CAMPUS GENERATION
+// ─────────────────────────────────────────────────────────────────
+const campusGroup = new THREE.Group();
+scene.add(campusGroup);
+const buildings = [];
+
+const gridSize = 10;
+for(let i=0; i<gridSize*gridSize; i++) {
+  const x = (i % gridSize) - gridSize/2;
+  const z = Math.floor(i / gridSize) - gridSize/2;
+  if(Math.abs(x) < 1 && Math.abs(z) < 1) continue; // Leave center open
+  
+  const h = Math.random() * 8 + 2;
+  const isSilo = Math.random() > 0.85;
+  const pos = new THREE.Vector3(x*7 + (Math.random()-0.5)*2, 0, z*7 + (Math.random()-0.5)*2);
+  const scale = new THREE.Vector3(isSilo? 1.5 : 2+Math.random()*2, h, isSilo? 1.5 : 2+Math.random()*2);
+  
+  const bldg = new THREE.Group();
+  bldg.position.copy(pos);
+  
+  const geo = isSilo ? new THREE.CylinderGeometry(scale.x, scale.x, 1, 16) : new THREE.BoxGeometry(scale.x, 1, scale.z);
+  geo.translate(0, 0.5, 0); // Origin at bottom
+  
+  const bpMesh = new THREE.Mesh(geo, blueprintMaterial);
+  bpMesh.scale.y = scale.y;
+  
+  const solidMesh = new THREE.Mesh(geo, solidMaterial);
+  solidMesh.scale.y = 0.01; // Start flat
+  solidMesh.castShadow = true;
+  solidMesh.receiveShadow = true;
+
+  bldg.add(bpMesh);
+  bldg.add(solidMesh);
+  campusGroup.add(bldg);
+  
+  buildings.push({ group: bldg, bp: bpMesh, solid: solidMesh, targetHeight: scale.y, seed: Math.random() });
+}
+
+// Particles
+const partsGeo = new THREE.BufferGeometry();
+const partsPos = [];
+for(let i=0; i<1000; i++) {
+  partsPos.push((Math.random()-0.5)*100, Math.random()*20, (Math.random()-0.5)*100);
+}
+partsGeo.setAttribute('position', new THREE.Float32BufferAttribute(partsPos, 3));
+const partsMat = new THREE.PointsMaterial({ color: '#00adef', size: 0.2, transparent: true, opacity: 0.6 });
+const particleSystem = new THREE.Points(partsGeo, partsMat);
+scene.add(particleSystem);
+
+// ─────────────────────────────────────────────────────────────────
+// GSAP SCROLL ANIMATION SYSTEM
+// ─────────────────────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+// App State
+const state = { scrollProgress: 0 };
+
+ScrollTrigger.create({
+  trigger: "#scroll-proxy",
+  start: "top top",
+  end: "bottom bottom",
+  onUpdate: (self) => {
+    state.scrollProgress = self.progress;
+    
+    // UI Update Logic
+    const phaseIndex = Math.min(4, Math.floor(self.progress * 5));
+    document.getElementById('t-phase').innerText = `0${phaseIndex+1} / 05`;
+    
+    const content = sections[phaseIndex];
+    const headEl = document.getElementById('t-head');
+    if(headEl.innerHTML !== content.head) {
+      // Simple fade out/in for text
+      gsap.to('#sec-content', { opacity: 0, y: -20, duration: 0.2, onComplete: () => {
+        document.getElementById('t-sub').innerText = content.sub;
+        headEl.innerHTML = content.head;
+        document.getElementById('t-desc').innerText = content.desc;
+        gsap.to('#sec-content', { opacity: 1, y: 0, duration: 0.4 });
+      }});
+    }
   }
-  return g;
-}
-scene.add(buildGrid());
+});
 
-// BUILDING FACTORY
-function mkBuilding(w,h,d,x,z,isGlass){
-  const g = new THREE.Group();
-  g.userData = {buildState:0, isHovered:false, baseH:h};
-  const geo = new THREE.BoxGeometry(w,h,d);
-  const bp = new THREE.Mesh(geo, matBP()); bp.userData.type='bp'; g.add(bp);
-  const asm = new THREE.Mesh(geo, matAsm()); asm.userData.type='asm'; asm.visible=false; g.add(asm);
-  const sol = new THREE.Mesh(geo, isGlass ? matGlass() : matSolid());
-  sol.userData.type='sol'; sol.visible=false; sol.castShadow=true; sol.receiveShadow=true; g.add(sol);
-  g.position.set(x, 0, z);
-  return g;
-}
+// ─────────────────────────────────────────────────────────────────
+// RENDER LOOP
+// ─────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
 
-// SILO FACTORY
-function mkSilo(r,h,x,z){
-  const g = new THREE.Group();
-  g.userData = {buildState:0, isHovered:false};
-  const cyl = new THREE.CylinderGeometry(r, r*1.08, h, 16);
-  const bp = new THREE.Mesh(cyl, matBP()); bp.userData.type='bp'; g.add(bp);
-  const sol = new THREE.Mesh(cyl, matSolid()); sol.userData.type='sol';
-  sol.visible=false; sol.castShadow=true; g.add(sol);
-  g.position.set(x,0,z);
-  return g;
-}
+function animate() {
+  requestAnimationFrame(animate);
+  const time = clock.getElapsedTime();
+  const p = state.scrollProgress;
 
-// FRAME FACTORY
-function mkFrame(w,h,d,x,z){
-  const g = new THREE.Group();
-  g.userData = {buildState:0};
-  const corners = [[-w/2,-d/2],[w/2,-d/2],[-w/2,d/2],[w/2,d/2]];
-  const matF = new THREE.LineBasicMaterial({color:0x0066cc,transparent:true,opacity:.5});
-  corners.forEach(([cx,cz])=>{
-    const colGeo = new THREE.CylinderGeometry(.15,.18,h,6);
-    const col = new THREE.Mesh(colGeo, matAsm());
-    col.position.set(cx, h/2, cz);
-    col.castShadow = true;
-    g.add(col);
+  // 1. Update Blueprint Shader
+  blueprintMaterial.uniforms.time.value = time;
+  blueprintMaterial.uniforms.uProgress.value = Math.max(0, Math.min(1, (p - 0.2) * 3.33));
+
+  // 2. Animate Buildings
+  buildings.forEach(b => {
+    // Growth threshold based on scroll and random seed
+    const growth = Math.max(0, Math.min(1, (p - 0.3 - b.seed * 0.1) * 2.5));
+    const easeGrowth = 1 - Math.pow(1 - growth, 3); // Cubic out
+    b.solid.scale.y = easeGrowth * b.targetHeight + 0.01;
   });
-  [0,h/2,h].forEach(y=>{
-    [[corners[0],corners[1]],[corners[2],corners[3]],[corners[0],corners[2]],[corners[1],corners[3]]].forEach(([a,b])=>{
-      const pts = [new THREE.Vector3(a[0],y,a[1]),new THREE.Vector3(b[0],y,b[1])];
-      g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), matF));
-    });
-  });
-  g.position.set(x,0,z);
-  return g;
+
+  // 3. Cinematic Camera Movement
+  const targetX = THREE.MathUtils.lerp(0, -15, p);
+  const targetY = THREE.MathUtils.lerp(40, 3, p);
+  const targetZ = THREE.MathUtils.lerp(50, 15, p);
+  camera.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.05);
+
+  const lookAtX = THREE.MathUtils.lerp(0, 10, p);
+  const lookAtY = THREE.MathUtils.lerp(0, 8, p);
+  const lookAtZ = THREE.MathUtils.lerp(0, -10, p);
+  
+  // Smooth lookAt tracking
+  const currentLookAt = new THREE.Vector3();
+  camera.getWorldDirection(currentLookAt);
+  const targetLookAt = new THREE.Vector3(lookAtX, lookAtY, lookAtZ);
+  camera.lookAt(camera.position.clone().add(currentLookAt.lerp(targetLookAt.sub(camera.position), 0.05)));
+
+  // 4. Atmosphere & Particles
+  scene.fog.density = THREE.MathUtils.lerp(0.015, 0.005, p);
+  particleSystem.rotation.y = time * 0.05;
+
+  renderer.render(scene, camera);
 }
 
-// CRANE FACTORY
-function mkCrane(x,z){
-  const g = new THREE.Group();
-  g.userData = {buildState:0};
-  const matC = matAsm();
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(.5,.7,4,8), matC); base.position.y=2; g.add(base);
-  const mast = new THREE.Mesh(new THREE.BoxGeometry(.6,.6,30), matC); mast.position.set(0,19,0); g.add(mast);
-  const boom = new THREE.Mesh(new THREE.BoxGeometry(26,.5,.5), matC); boom.position.set(0,34,0); g.add(boom);
-  const cab  = new THREE.Mesh(new THREE.BoxGeometry(2.5,2.5,2.5), matC); cab.position.set(-2,36,0); g.add(cab);
-  const cable = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(8,34,0),new THREE.Vector3(8,18,0)]);
-  g.add(new THREE.Line(cable, new THREE.LineBasicMaterial({color:0x88ccee,transparent:true,opacity:.6})));
-  g.position.set(x,0,z);
-  return g;
-}
+animate();
 
-// BUILD SCENE
-const buildings = new THREE.Group();
-const silos = new THREE.Group();
-const frames = new THREE.Group();
-const cranes = new THREE.Group();
+// Resize Handler
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
 
-[
-  [14,10,12,-22,-18,false],[9,16,9,0,-20,true],[16,7,14,24,-14,false],
-  [11,20,9,-30,4,false],[7,12,7,18,12,true],[22,6,16,6,10,false],
-  [9,8,9,-12,22,false],[13,10,12,30,20,false],[8,14,8,-5,-8,false]
-].forEach(([w,h,d,x,z,gl]) => buildings.add(mkBuilding(w,h,d,x,z,gl)));
-
-[[
+</body>
+</html>
